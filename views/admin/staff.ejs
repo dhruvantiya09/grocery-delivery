@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Staff Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+<div class="flex justify-between items-center mb-8">
+  <h1 class="text-2xl font-bold mb-6">Staff Management</h1>
+  <a href="/admin/dashboard"
+     class="text-black px-5 py-2 rounded-lg bolder">
+    ← Back to Dashboard
+  </a>
+</div>
+
+<!-- Add Staff Form -->
+<div class="bg-white p-6 rounded shadow mb-6">
+  <form action="/admin/staff/add" method="POST" class="grid grid-cols-2 gap-4">
+
+    <input name="name" placeholder="Name" class="border p-2 rounded" required />
+    <input name="role" placeholder="Role (Cashier, Delivery...)" class="border p-2 rounded" required />
+    <input name="salary" type="number" placeholder="Salary" class="border p-2 rounded" required />
+    <input name="workTime" placeholder="Work Time (9AM-6PM)" class="border p-2 rounded" required />
+    <input name="phone" placeholder="Phone" class="border p-2 rounded" required />
+
+    <button class="bg-green-600 text-white py-2 rounded col-span-2">
+      Add Staff
+    </button>
+  </form>
+</div>
+
+<!-- Staff Table -->
+<div class="bg-white p-6 rounded shadow">
+  <table class="w-full border">
+    <tr class="bg-gray-200">
+      <th class="p-2">Name</th>
+      <th class="p-2">Role</th>
+      <th class="p-2">Salary</th>
+      <th class="p-2">Work Time</th>
+      <th class="p-2">Phone</th>
+      <th class="p-2">Deduction</th>
+      <th class="p-2">Final Salary</th>
+      <th class="p-2">Deduct</th>
+      <th class="p-2">Action</th>
+    </tr>
+
+    <% staff.forEach(s => { %>
+    <tr class="border-t">
+      <td class="p-2 text-center"><%= s.name %></td>
+      <td class="p-2 text-center"><%= s.role %></td>
+      <td class="p-2 text-center">₹ <%= s.salary %></td>
+      <td class="p-2 text-center"><%= s.workTime %></td>
+      <td class="p-2 text-center"><%= s.phone %></td>
+
+      <td class="p-2 text-center text-red-600">
+  ₹ <%= s.deduction %>
+</td>
+
+<td class="p-2 text-center font-bold text-green-600">
+  ₹ <%= s.salary - s.deduction %>
+</td>
+
+<td class="p-2 text-center">
+  <form action="/admin/staff/deduct/<%= s._id %>" method="POST" class="flex gap-2 justify-center">
+    <input type="number" name="amount" placeholder="₹" class="border w-20 p-1 rounded" required>
+    <button class="bg-yellow-500 text-white px-2 rounded">Deduct</button>
+  </form>
+</td>
+
+
+      <td class="p-2 text-center">
+        <form action="/admin/staff/delete/<%= s._id %>" method="POST">
+          <button class="text-red-600">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+
+  </table>
+</div>
+
+</body>
+</html>

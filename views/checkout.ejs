@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-10 rounded-2xl shadow-xl w-[450px]">
+
+  <h1 class="text-2xl font-bold mb-6 text-center">
+    Secure Payment
+  </h1>
+
+  <form action="/order/place" method="POST">
+
+    <!-- Fake Card Number -->
+    <div class="mb-4">
+      <label class="block text-sm mb-1">Card Number</label>
+      <input type="text"
+             class="w-full border px-4 py-2 rounded"
+             placeholder="1234 5678 9012 3456"
+             required>
+    </div>
+
+    <!-- Expiry -->
+    <div class="flex gap-4 mb-4">
+      <div class="flex-1">
+        <label class="block text-sm mb-1">Expiry</label>
+        <input type="text"
+               class="w-full border px-4 py-2 rounded"
+               placeholder="MM/YY"
+               required>
+      </div>
+
+      <div class="flex-1">
+        <label class="block text-sm mb-1">CVV</label>
+        <input type="text"
+               class="w-full border px-4 py-2 rounded"
+               placeholder="123"
+               required>
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="mb-6">
+      <label class="block text-sm mb-1">Payment Method</label>
+      <select class="w-full border px-4 py-2 rounded">
+        <option>Credit Card</option>
+        <option>Debit Card</option>
+        <option>UPI</option>
+        <option>Cash on Delivery</option>
+      </select>
+    </div>
+
+    <button
+      class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition">
+      Pay & Place Order
+    </button>
+
+  </form>
+
+</div>
+
+</body>
+</html>

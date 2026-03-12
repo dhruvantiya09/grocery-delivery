@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Delivery Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-8">
+
+<div class="max-w-6xl mx-auto">
+
+  <h1 class="text-3xl font-bold mb-8 text-gray-800">
+    🚚 My Deliveries
+  </h1>
+
+  <% if(orders.length === 0) { %>
+
+    <div class="bg-white p-10 rounded-xl shadow text-center">
+      <h2 class="text-xl font-semibold text-gray-700">
+        No deliveries assigned yet
+      </h2>
+      <p class="text-gray-500 mt-2">
+        Accept orders from available orders page.
+      </p>
+
+      <a href="/delivery/available-orders"
+         class="inline-block mt-6 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+        View Available Orders
+      </a>
+    </div>
+
+  <% } %>
+
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+  <% orders.forEach(order => { %>
+
+    <div class="bg-white rounded-xl shadow-lg p-6 border">
+
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-lg">
+          Order #<%= order._id.toString().slice(-6) %>
+        </h2>
+
+        <span class="px-3 py-1 text-sm rounded-full
+          <%= order.status === 'Confirmed' ? 'bg-yellow-100 text-yellow-700' : '' %>
+          <%= order.status === 'Out for Delivery' ? 'bg-blue-100 text-blue-700' : '' %>">
+
+          <%= order.status %>
+
+        </span>
+      </div>
+
+
+      <div class="space-y-2 text-gray-600">
+
+        <p>
+          👤 <b>Customer:</b> <%= order.user.name %>
+        </p>
+
+        <p>
+          📍 <b>Address:</b> <%= order.address %>
+        </p>
+
+        <p>
+          💰 <b>Total:</b> ₹<%= order.totalAmount %>
+        </p>
+
+      </div>
+
+
+      <div class="mt-6">
+
+        <% if(order.status === "Confirmed") { %>
+
+          <form action="/delivery/out-for-delivery/<%= order._id %>" method="POST">
+            <button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+              Start Delivery
+            </button>
+          </form>
+
+        <% } %>
+
+
+        <% if(order.status === "Out for Delivery") { %>
+
+          <form action="/delivery/delivered/<%= order._id %>" method="POST">
+            <button class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+              Mark Delivered
+            </button>
+          </form>
+
+        <% } %>
+
+      </div>
+
+    </div>
+
+  <% }) %>
+
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin - Expenses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+  @keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .animate-scale {
+    animation: scaleIn 0.2s ease-out;
+  }
+</style>
+</head>
+
+<body class="bg-gray-100 flex min-h-screen">
+
+<!-- Main Content -->
+<div class="flex-1 p-8">
+<div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold mb-6">Expenses</h1>
+    <a href="/admin/dashboard"
+       class="text-black px-5 py-2 rounded-lg bolder">
+      ← Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Add Expense -->
+  <div class="bg-white p-6 rounded-xl shadow mb-8">
+    <form action="/admin/expenses/add" method="POST" class="flex gap-4">
+      <input name="title" placeholder="Expense Name"
+             class="border p-3 rounded-lg w-full" required />
+
+      <input name="amount" type="number" min="0"
+             placeholder="Amount"
+             class="border p-3 rounded-lg w-full" required />
+
+      <button class="bg-green-600 text-white px-6 rounded-lg">
+        Add
+      </button>
+    </form>
+  </div>
+
+  <!-- Chart -->
+  <div class="bg-white p-6 rounded-xl shadow mb-8">
+    <h2 class="text-lg font-semibold mb-4">Expense Chart</h2>
+    <canvas id="expenseChart"></canvas>
+  </div>
+
+  <!-- Expense Table -->
+  <div class="bg-white rounded-xl shadow overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="p-4">Title</th>
+          <th class="p-4">Amount</th>
+          <th class="p-4">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% let total = 0; %>
+        <% expenses.forEach(e => { total += e.amount; %>
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-4"><%= e.title %></td>
+            <td class="p-4 text-red-600">₹ <%= e.amount %></td>
+            <td class="p-4 flex gap-2">
+
+              <button 
+  onclick="openEditModal('<%= e._id %>', '<%= e.title %>', '<%= e.amount %>')"
+  class="bg-blue-500 text-white px-3 py-1 rounded">
+  Edit
+</button>
+
+
+              <form action="/admin/expenses/delete/<%= e._id %>" method="POST">
+                <button class="bg-red-600 text-white px-3 py-1 rounded">
+                  Delete
+                </button>
+              </form>
+
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <div class="p-4 bg-gray-100 font-bold text-right">
+      Total: ₹ <%= total %>
+    </div>
+  </div>
+
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center">
+
+  <div class="bg-white p-6 rounded-xl w-96 relative animate-scale">
+
+    <button onclick="closeModal()"
+            class="absolute top-3 right-3 text-gray-500 hover:text-black">
+      ✕
+    </button>
+
+    <h2 class="text-xl font-bold mb-4">Edit Expense</h2>
+
+    <form id="editForm" method="POST">
+      <input id="editTitle"
+             name="title"
+             class="w-full border p-3 rounded-lg mb-4"
+             required />
+
+      <input id="editAmount"
+             name="amount"
+             type="number"
+             min="0"
+             class="w-full border p-3 rounded-lg mb-4"
+             required />
+
+      <button class="w-full bg-green-600 text-white py-2 rounded-lg">
+        Update Expense
+      </button>
+    </form>
+
+  </div>
+</div>
+
+
+<script>
+
+ function openEditModal(id, title, amount) {
+    document.getElementById("editModal").classList.remove("hidden");
+
+    document.getElementById("editTitle").value = title;
+    document.getElementById("editAmount").value = amount;
+
+    document.getElementById("editForm").action =
+      "/admin/expenses/update/" + id;
+  }
+
+  function closeModal() {
+    document.getElementById("editModal").classList.add("hidden");
+  }
+
+  const ctx = document.getElementById('expenseChart');
+
+  const labels = [<% expenses.forEach((e, i) => { %>"<%= e.title %>"<% if (i < expenses.length - 1) { %>,<% } %><% }) %>];
+
+  const data = [<% expenses.forEach((e, i) => { %><%= e.amount %><% if (i < expenses.length - 1) { %>,<% } %><% }) %>];
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Expenses',
+        data: data,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

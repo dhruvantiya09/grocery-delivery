@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-8">
+
+<div class="max-w-5xl mx-auto">
+
+  <!-- Back Button -->
+  <a href="/my-orders" 
+     class="text-blue-600 hover:underline mb-6 inline-block">
+     ← Back to My Orders
+  </a>
+
+  <!-- Card -->
+  <div class="bg-white rounded-2xl shadow-lg p-8">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b pb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Order Details</h1>
+        <p class="text-gray-500 text-sm">
+          Order ID: <%= order._id %>
+        </p>
+        <p class="text-gray-400 text-sm">
+          <%= order.createdAt.toDateString() %>
+        </p>
+      </div>
+
+      <div>
+        <span class="
+          px-4 py-2 rounded-full text-sm font-semibold
+          <%= order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
+              order.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+              'bg-yellow-100 text-yellow-700' %>
+        ">
+          <%= order.status %>
+        </span>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="mt-8 space-y-6">
+      <% order.items.forEach(item => { %>
+
+        <div class="flex items-center gap-6 border rounded-xl p-4">
+
+          <img src="<%= item.image %>"
+               class="w-24 h-24 rounded-xl object-cover">
+
+          <div class="flex-1">
+            <h2 class="text-lg font-semibold"><%= item.name %></h2>
+            <p class="text-gray-600">
+              ₹ <%= item.price %> × <%= item.qty %>
+            </p>
+          </div>
+
+          <div class="text-lg font-bold">
+            ₹ <%= item.price * item.qty %>
+          </div>
+
+        </div>
+
+      <% }) %>
+    </div>
+
+    <!-- Summary -->
+    <div class="mt-10 border-t pt-6">
+
+      <div class="flex justify-between mb-2">
+        <span class="text-gray-600">Total Amount</span>
+        <span class="text-xl font-bold text-green-600">
+          ₹ <%= order.totalAmount %>
+        </span>
+      </div>
+
+      <div class="flex justify-between mb-2">
+        <span class="text-gray-600">Payment Method</span>
+        <span><%= order.paymentMethod %></span>
+      </div>
+
+    </div>
+
+    <!-- Delivery Info -->
+    <div class="mt-10 border-t pt-6">
+      <h3 class="text-lg font-semibold mb-4">Delivery Information</h3>
+
+      <p><strong>Name:</strong> <%= order.customerName %></p>
+      <p><strong>Phone:</strong> <%= order.phone %></p>
+      <p><strong>Address:</strong> <%= order.address %></p>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

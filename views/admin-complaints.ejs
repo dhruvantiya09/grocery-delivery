@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Customer Complaints</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    .success-box{
+  background:#e8f8ef;
+  color:#1e7e34;
+  padding:15px 20px;
+  border-radius:8px;
+  margin-bottom:20px;
+  font-weight:500;
+  border-left:5px solid #28a745;
+  animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown{
+  from{
+    opacity:0;
+    transform:translateY(-10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+body{
+  font-family:'Inter',sans-serif;
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100 min-h-screen p-8">
+
+<div class="max-w-7xl mx-auto">
+
+<!-- Header -->
+<div class="flex justify-between items-center mb-8">
+
+<div>
+<h1 class="text-3xl font-bold text-gray-800">Customer Complaints</h1>
+<p class="text-gray-500 text-sm">Support tickets submitted by customers</p>
+</div>
+
+<a href="/admin/dashboard"
+class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg shadow">
+← Back to Dashboard
+</a>
+
+</div>
+
+<% if(resolved){ %>
+
+<div id="successMessage" class="success-box">
+  ✅ Complaint resolved successfully. Email sent to user.
+</div>
+
+<% } %>
+
+<!-- If no complaints -->
+<% if(!complaints || complaints.length === 0){ %>
+
+<div class="bg-white p-12 rounded-xl shadow text-center">
+<p class="text-gray-500 text-lg">
+No complaints submitted yet
+</p>
+</div>
+
+<% } %>
+
+
+<!-- Complaints Grid -->
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+<% complaints.forEach(c => { %>
+
+<div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-6 border">
+
+<!-- Top Row -->
+<div class="flex justify-between items-center mb-4">
+
+<span class="text-xs text-gray-500">
+Order: <%= c.orderId || "General Complaint" %>
+</span>
+
+<span class="px-3 py-1 rounded-full text-xs font-semibold
+<%= c.priority === 'High' ? 'bg-red-100 text-red-700' : '' %>
+<%= c.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' : '' %>
+<%= c.priority === 'Low' ? 'bg-green-100 text-green-700' : '' %>">
+
+<%= c.priority %>
+
+</span>
+
+</div>
+
+
+<!-- Complaint Type -->
+<h2 class="font-semibold text-gray-800 text-lg mb-2">
+<%= c.type %>
+</h2>
+
+
+<!-- Message -->
+<p class="text-gray-600 text-sm mb-4">
+<%= c.message %>
+</p>
+
+
+<!-- Contact + Date -->
+<div class="text-sm text-gray-500 mb-5">
+
+<p>
+Contact: <span class="font-medium text-gray-700"><%= c.preferredContact %></span>
+</p>
+
+<p>
+Date: <%= new Date(c.createdAt).toDateString() %>
+</p>
+
+</div>
+
+
+<!-- Actions -->
+<div class="flex justify-between items-center">
+
+<form action="/admin/complaint/delete/<%= c._id %>"
+method="POST"
+onsubmit="return confirm('Delete this complaint?')">
+
+<button
+class="text-red-600 hover:text-red-800 font-semibold text-sm">
+Delete
+</button>
+
+</form>
+
+
+<form action="/admin/complaint/resolve/<%= c._id %>"
+method="POST">
+
+<% if(c.status === "Resolved"){ %>
+
+      <span class="resolved-badge">✔ Resolved</span>
+
+  <% } else { %>
+
+      <form action="/admin/complaint/resolve/<%= c._id %>" method="POST">
+        <button class="resolve-btn">Mark Resolved</button>
+      </form>
+
+  <% } %>
+
+</form>
+
+</div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+</div>
+
+<script>
+
+setTimeout(()=>{
+  const msg = document.getElementById("successMessage");
+  if(msg){
+    msg.style.display="none";
+  }
+},3000);
+
+</script>
+
+</body>
+</html>

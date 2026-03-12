@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-8">
+
+<!-- Back Button -->
+<button onclick="window.location.href='/shop'"
+  class="px-6 py-2 rounded-lg text-gray-700 hover:text-black">
+  ← Back to Shop
+</button>
+
+<div class="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-md mt-6">
+
+  <h2 class="text-3xl font-bold mb-6">Checkout</h2>
+
+  <!-- Address Section -->
+  <div class="bg-gray-50 p-5 rounded-xl mb-6">
+
+    <div class="flex justify-between items-center">
+
+      <div>
+        <p class="font-semibold text-lg"><%= user.name %></p>
+        <p class="text-gray-600"><%= user.email %></p>
+        <p class="text-gray-600"><%= user.address %></p>
+      </div>
+
+      <a href="/profile"
+        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow">
+        Update
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- Order Summary -->
+  <h3 class="text-xl font-semibold mb-4">Order Summary</h3>
+
+  <% let total = 0; %>
+
+  <% if (!cart || cart.length === 0) { %>
+
+    <div class="text-center py-10">
+
+  <p class="text-gray-500 text-lg mb-4">
+    No orders in cart
+  </p>
+
+  <a href="/shop"
+     class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow">
+     Shop More
+  </a>
+
+</div>
+
+  <% } else { %>
+
+  <div id="cartItems" class="space-y-4">
+
+    <% cart.forEach((item,i,index) => { %>
+
+    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-xl">
+
+      <div class="flex items-center gap-4">
+
+        <img src="<%= item.image %>"
+          class="w-16 h-16 rounded-lg object-cover">
+
+        <div>
+
+          <p class="font-medium text-lg"><%= item.name %></p>
+
+          <!-- Quantity Controls -->
+          <div class="flex items-center gap-2 mt-1">
+
+            <button onclick="decreaseQty(<%= i %>)"
+              class="w-7 h-7 bg-gray-200 rounded hover:bg-gray-300">
+              -
+            </button>
+
+            <span id="qty-<%= i %>" class="font-semibold">
+              <%= item.qty %>
+            </span>
+
+            <button onclick="increaseQty(<%= i %>)"
+              class="w-7 h-7 bg-gray-200 rounded hover:bg-gray-300">
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="flex items-center gap-5">
+
+        <span id="price-<%= i %>" class="font-semibold text-lg">
+          ₹ <%= item.price * item.qty %>
+        </span>
+
+         <!-- Remove Button -->
+  <form action="/cart/remove/<%= index %>" method="POST">
+    <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+      Remove
+    </button>
+  </form>
+
+      </div>
+
+    </div>
+
+    <% total += item.price * item.qty; %>
+
+    <% }) %>
+
+  </div>
+
+  <!-- Totals -->
+  <div class="border-t mt-6 pt-6 space-y-3">
+
+    <div class="flex justify-between text-gray-700">
+      <span>Subtotal</span>
+      <span id="subtotal">₹ <%= total %></span>
+    </div>
+
+    <div class="flex justify-between text-gray-700">
+      <span>Delivery Fee</span>
+      <span id="delivery">₹ 40</span>
+    </div>
+
+    <div class="flex justify-between font-bold text-xl border-t pt-3">
+      <span>Grand Total</span>
+      <span id="grandTotal">₹ <%= total + 40 %></span>
+    </div>
+
+  </div>
+
+  <!-- Pay Button -->
+  <div class="flex justify-end mt-6">
+
+    <button onclick="startPayment()"
+      class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl shadow-lg font-semibold text-lg">
+      Pay for Order
+    </button>
+
+  </div>
+
+  <% } %>
+
+</div>
+
+
+<script>
+
+const cartData = <%-JSON.stringify(cart || [])%>;
+
+function updateTotals(){
+
+  let subtotal = 0;
+
+  cartData.forEach(item=>{
+    subtotal += item.price * item.qty;
+  });
+
+  const delivery = 40;
+
+  document.getElementById("subtotal").innerText = "₹ " + subtotal;
+  document.getElementById("grandTotal").innerText = "₹ " + (subtotal + delivery);
+
+}
+
+async function increaseQty(index){
+
+  cartData[index].qty++;
+
+  document.getElementById("qty-"+index).innerText = cartData[index].qty;
+
+  document.getElementById("price-"+index).innerText =
+    "₹ " + (cartData[index].price * cartData[index].qty);
+
+  updateTotals();
+
+  await fetch("/cart/update-qty",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      index:index,
+      qty:cartData[index].qty
+    })
+  });
+
+}
+
+async function decreaseQty(index){
+
+  if(cartData[index].qty > 1){
+
+    cartData[index].qty--;
+
+    document.getElementById("qty-"+index).innerText = cartData[index].qty;
+
+    document.getElementById("price-"+index).innerText =
+      "₹ " + (cartData[index].price * cartData[index].qty);
+
+    updateTotals();
+
+    await fetch("/cart/update-qty",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        index:index,
+        qty:cartData[index].qty
+      })
+    });
+
+  }
+
+}
+
+function removeItem(index){
+
+  cartData.splice(index,1);
+
+  location.reload();
+
+}
+
+async function startPayment(){
+
+  if(cartData.length === 0){
+    alert("Cart is empty");
+    return;
+  }
+
+  try{
+
+    const res = await fetch("/order/start-payment",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({cart:cartData})
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+
+      window.location.href="/payment";
+
+    }else{
+
+      alert(data.message);
+
+    }
+
+  }catch(err){
+
+    console.error(err);
+    alert("Something went wrong");
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>

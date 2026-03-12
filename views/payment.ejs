@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-8 rounded-2xl shadow-xl w-[420px] text-center">
+
+<h2 class="text-2xl font-bold mb-6">💳 Complete Payment</h2>
+
+<p class="text-lg mb-6">
+Total: <span class="text-green-600 font-bold">₹ <%= totalAmount %></span>
+</p>
+
+<!-- Payment Options -->
+<div class="text-left mb-6 space-y-3">
+
+<label class="flex items-center gap-3 cursor-pointer">
+<input type="radio" name="payment" value="Online" checked onclick="showQR()">
+<span class="font-medium">Online Payment</span>
+</label>
+
+<label class="flex items-center gap-3 cursor-pointer">
+<input type="radio" name="payment" value="Cash" onclick="hideQR()">
+<span class="font-medium">Cash on Delivery</span>
+</label>
+
+</div>
+
+<!-- QR Section -->
+<div id="qrSection" class="mb-6">
+
+<p class="text-sm text-gray-500 mb-2">Scan QR to Pay</p>
+
+<img
+src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DemoPayment"
+class="mx-auto rounded-lg shadow"
+/>
+
+<p class="text-xs text-gray-400 mt-2">Demo QR Payment</p>
+
+</div>
+
+<!-- Pay Button -->
+<button id="payBtn"
+onclick="completePayment()"
+class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition">
+
+Confirm Order
+
+</button>
+
+</div>
+
+
+<script>
+
+let paymentMethod = "Online"
+
+function showQR(){
+paymentMethod = "Online"
+document.getElementById("qrSection").style.display = "block"
+}
+
+function hideQR(){
+paymentMethod = "Cash"
+document.getElementById("qrSection").style.display = "none"
+}
+
+async function completePayment(){
+
+const btn = document.getElementById("payBtn")
+
+btn.disabled = true
+btn.innerText = "Processing..."
+
+try{
+
+const res = await fetch("/order/place",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+paymentMethod:paymentMethod
+})
+})
+
+const data = await res.json()
+
+if(data.success){
+
+alert("Order Placed Successfully 🎉")
+
+window.location.href="/my-orders"
+
+}else{
+
+alert(data.message || "Payment failed")
+
+btn.disabled=false
+btn.innerText="Confirm Order"
+
+}
+
+}catch(err){
+
+alert("Something went wrong")
+
+btn.disabled=false
+btn.innerText="Confirm Order"
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

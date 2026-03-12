@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Available Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <div class="max-w-6xl mx-auto py-10 px-6">
+    
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">
+      🚚 Available Orders
+    </h1>
+
+    <% if (orders.length === 0) { %>
+      <div class="bg-white p-8 rounded-2xl shadow text-center">
+        <p class="text-gray-500 text-lg">
+          No pending orders right now.
+        </p>
+      </div>
+    <% } %>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <% orders.forEach(order => { %>
+        
+        <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 p-6 flex flex-col justify-between">
+          
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
+                Pending
+              </span>
+              <span class="text-gray-500 text-sm">
+                #<%= order._id.toString().slice(-5) %>
+              </span>
+            </div>
+
+            <h2 class="text-lg font-semibold mb-2">
+              👤 <%= order.user ? order.user.name : "Unknown Customer" %>
+            </h2>
+
+            <p class="text-gray-600 text-sm mb-2">
+              📍 <%= order.address %>
+            </p>
+
+            <p class="text-green-600 font-bold text-lg mt-3">
+              ₹ <%= order.totalAmount %>
+            </p>
+          </div>
+
+          <form action="/delivery/accept-order/<%= order._id %>" method="POST">
+            <button 
+              class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-semibold transition">
+              Accept Order
+            </button>
+          </form>
+
+        </div>
+
+      <% }) %>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

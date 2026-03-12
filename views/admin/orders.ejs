@@ -1,0 +1,41 @@
+<div class="p-6">
+  <h1 class="text-3xl font-bold mb-6">Orders</h1>
+
+  <table class="w-full bg-white rounded-xl shadow overflow-hidden">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="p-3 text-left">Order ID</th>
+        <th class="p-3">Items</th>
+        <th class="p-3">Total</th>
+        <th class="p-3">Status</th>
+        <th class="p-3">Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% orders.forEach(order => { %>
+        <tr class="border-t">
+          <td class="p-3"><%= order._id %></td>
+
+          <td class="p-3">
+            <% order.items.forEach(item => { %>
+              <p><%= item.name %> × <%= item.qty %></p>
+            <% }) %>
+          </td>
+
+          <td class="p-3 font-semibold">₹<%= order.totalAmount %></td>
+
+          <td class="p-3">
+            <span class="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+              <%= order.status %>
+            </span>
+          </td>
+
+          <td class="p-3">
+            <%= order.createdAt.toDateString() %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
